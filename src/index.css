@@ -31,12 +31,18 @@ body {
   display: flex;
   flex-direction: column;
   width: 550px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+@media only screen and (min-width: 580px){
+  .weather-container{
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
+
 }
 
 .current {
@@ -117,6 +123,10 @@ button:hover{
 
 .bydate__header__item:not(:last-of-type){
   margin-right: 15px;
+}
+
+.bydate__header__item.active{
+  text-decoration: underline;
 }
 
 .bydate__body{

@@ -94,7 +94,7 @@ function App() {
     if (epoch < 10000000000) epoch *= 1000;
     epoch = epoch + (new Date().getTimezoneOffset() * -1);        
     return new Date(epoch);
-}
+  }
 
   return weatherData ? (
     <div className="container">
@@ -116,8 +116,17 @@ function App() {
         </div>
         <div className="bydate">
           <div className="bydate__header">
-            <div className="bydate__header__item" onClick={() => setByDateHourly(true)}>Hourly</div>
-            <div className="bydate__header__item" onClick={() => setByDateHourly(false)}>Daily</div>
+            {byDateHourly ? (
+              <>
+                <div className="bydate__header__item active" onClick={() => setByDateHourly(true)}>Hourly</div>
+                <div className="bydate__header__item" onClick={() => setByDateHourly(false)}>Daily</div>
+              </>
+            ) : (
+              <>
+                <div className="bydate__header__item" onClick={() => setByDateHourly(true)}>Hourly</div>
+                <div className="bydate__header__item active" onClick={() => setByDateHourly(false)}>Daily</div>
+              </>
+            )}
           </div>
           <div className="bydate__body">
           {byDateHourly ? weatherData.hourly.slice(0, 6).map((item, ix) => (
