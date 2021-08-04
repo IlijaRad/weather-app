@@ -33,7 +33,7 @@ function App() {
     async function getWeatherForecast() {
       const lat = location.coords.lat;
       const lon = location.coords.lon;
-      const result = await fetch(`http://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=${API_KEY}`);
+      const result = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=${API_KEY}`);
       const data = await result.json();
       setWeatherData(data);
     }
