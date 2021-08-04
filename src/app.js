@@ -6,12 +6,22 @@ function App() {
   const [location, setLocation] = useState({ city: 'Krusevac', coords: { lat: 43.58, lon: 21.33389 } });
   const [isCelsius, setIsCelsius] = useState(true);
   const [weatherData, setWeatherData] = useState(null);
+  const [byDateHourly, setByDateHourly] = useState(true);
 
   const API_KEY = '89301df2be1051593bf04d4e672d3729';
+  const API_KEY_2 = 'pk.1c68a0c13f86af3c08c005f9468d6644';
+
   useEffect(() => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((pos) => {
-        setLocation({ ...location, coords: { lat: pos.coords.latitude, lon: pos.coords.longitude } })
+      async function getCity(lat, lon){
+        const result = await fetch(`https://us1.locationiq.com/v1/reverse.php?key=${API_KEY_2}&lat=${lat}&lon=${lon}&format=json`);
+        const data = await result.json();
+        return data.address.city;
+      }
+
+      navigator.geolocation.getCurrentPosition(async ({coords: {latitude : lat, longitude: lon}}) => {
+        const city = await getCity(lat, lon);
+        setLocation({ city, coords: { lat, lon } })
       })
     } else {
       alert('Location is not supported by your browser');
@@ -20,14 +30,15 @@ function App() {
   }, [])
 
   useEffect(() => {
-    async function fetchWeatherForecast() {
+    async function getWeatherForecast() {
       const lat = location.coords.lat;
       const lon = location.coords.lon;
       const result = await fetch(`http://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=${API_KEY}`);
       const data = await result.json();
       setWeatherData(data);
     }
-    fetchWeatherForecast();
+
+    getWeatherForecast();
   }, [location]);
 
   const kToCelsius = temp => {
@@ -39,7 +50,7 @@ function App() {
   }
 
   const DateInfo = () => {
-    return <div>Today • {new Date().toDateString()}</div>
+    return <div className="current-left__date">{new Date().toLocaleDateString('en-US', {month: 'long', day:'numeric', year: 'numeric'})}</div>
   }
 
   const Temperature = () => {
@@ -52,12 +63,38 @@ function App() {
   }
 
   const WeatherType = () => {
-    return <div className="weathertype">{weatherData.current.weather[0].main}</div>
+    return <div className="current-left__weathertype">{weatherData.current.weather[0].main}</div>
   }
 
   const WeatherIcon = () => {
-    return <img src={`http://openweathermap.org/img/wn/${weatherData.current.weather[0].icon}@2x.png`} alt="" />
+    return <img className="weather-icon" src={`http://openweathermap.org/img/wn/${weatherData.current.weather[0].icon}@2x.png`} alt="" />
   }
+
+  const ByHourBodyItem = ({time, icon, temp}) => {
+    return (
+      <div className="bydate__body__item">
+        <div className="bydate__body__item__time">{epochToDate(time).toLocaleString('en-US', { hour: 'numeric', hour12: true })}</div>
+        <img className="bydate__body__item__icon" src={`http://openweathermap.org/img/wn/${icon}.png`} alt="" />
+        <div className="bydate__body__item__temp">{kToCelsius(temp)}</div>
+      </div>
+    )
+  }
+
+  const ByDayBodyItem = ({min, max, icon}) => {
+    return (
+      <div className="bydate__body__item">
+        <div className="bydate__body__item__max">{kToCelsius(max)}</div>
+        <img className="bydate__body__item__icon" src={`http://openweathermap.org/img/wn/${icon}.png`} alt="" />
+        <div className="bydate__body__item__min">{kToCelsius(min)}</div>
+      </div>
+    )
+  }
+
+  const epochToDate = epoch => {
+    if (epoch < 10000000000) epoch *= 1000;
+    epoch = epoch + (new Date().getTimezoneOffset() * -1);        
+    return new Date(epoch);
+}
 
   return weatherData ? (
     <div className="container">
@@ -78,6 +115,19 @@ function App() {
           </div>
         </div>
         <div className="bydate">
+          <div className="bydate__header">
+            <div className="bydate__header__item" onClick={() => setByDateHourly(true)}>Hourly</div>
+            <div className="bydate__header__item" onClick={() => setByDateHourly(false)}>Daily</div>
+          </div>
+          <div className="bydate__body">
+          {byDateHourly ? weatherData.hourly.slice(0, 6).map((item, ix) => (
+            <ByHourBodyItem key={ix} time={item.dt} icon={item.weather[0].icon} temp={item.temp} />
+          )) : (
+            weatherData.daily.slice(0, 6).map((item, ix) => (
+              <ByDayBodyItem key={ix} min={item.temp.min} icon={item.weather[0].icon} max={item.temp.max} />
+          )))}
+
+          </div>
         </div>
       </div>
     </div>
