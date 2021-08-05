@@ -74,7 +74,7 @@ function App() {
       <div className="bydate__body__item">
         <div className="bydate__body__item__time">{epochToDate(date).toLocaleString('en-US', { hour: 'numeric', hour12: true })}</div>
         <img className="bydate__body__item__icon" src={`http://openweathermap.org/img/wn/${icon}.png`} alt="" />
-        <div className="bydate__body__item__temp">{isCelsius ? kToCelsius(temp) : kToFahrenheit(temp)}°C</div>
+        <div className="bydate__body__item__temp">{isCelsius ? `${kToCelsius(temp)}°C` : `${kToFahrenheit(temp)}°F`}</div>
       </div>
     )
   }
