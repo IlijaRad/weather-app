@@ -45,6 +45,13 @@ body {
 
 }
 
+@media only screen and (max-width: 580px){
+  .weather-container{
+    border-top: 1px solid rgba(255, 255, 255, 0.349);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.349);
+  }
+}
+
 .current {
   display: flex;
   justify-content: space-between;
@@ -83,7 +90,6 @@ body {
 }
 
 button{
-  border: none;
   border-radius: 9999px;
   padding: 5px;
   cursor: pointer;
@@ -139,4 +145,8 @@ button:hover{
   flex-direction: column;
   align-items: center;
   font-size: 18px;
+}
+
+.bydate__body__item__max{
+  margin-bottom: 6px;
 }

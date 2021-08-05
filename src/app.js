@@ -31,8 +31,7 @@ function App() {
 
   useEffect(() => {
     async function getWeatherForecast() {
-      const lat = location.coords.lat;
-      const lon = location.coords.lon;
+      const {lat, lon} = location.coords;
       const result = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=${API_KEY}`);
       const data = await result.json();
       setWeatherData(data);
@@ -70,22 +69,23 @@ function App() {
     return <img className="weather-icon" src={`http://openweathermap.org/img/wn/${weatherData.current.weather[0].icon}@2x.png`} alt="" />
   }
 
-  const ByHourBodyItem = ({time, icon, temp}) => {
+  const ByHourBodyItem = ({date, icon, temp}) => {
     return (
       <div className="bydate__body__item">
-        <div className="bydate__body__item__time">{epochToDate(time).toLocaleString('en-US', { hour: 'numeric', hour12: true })}</div>
+        <div className="bydate__body__item__time">{epochToDate(date).toLocaleString('en-US', { hour: 'numeric', hour12: true })}</div>
         <img className="bydate__body__item__icon" src={`http://openweathermap.org/img/wn/${icon}.png`} alt="" />
-        <div className="bydate__body__item__temp">{kToCelsius(temp)}</div>
+        <div className="bydate__body__item__temp">{isCelsius ? kToCelsius(temp) : kToFahrenheit(temp)}°C</div>
       </div>
     )
   }
 
-  const ByDayBodyItem = ({min, max, icon}) => {
+  const ByDayBodyItem = ({date, min, max, icon}) => {
     return (
       <div className="bydate__body__item">
-        <div className="bydate__body__item__max">{kToCelsius(max)}</div>
+        <div className="bydate__body__item__date">{epochToDate(date).toLocaleString('en-US', {weekday: 'short'})}</div>
         <img className="bydate__body__item__icon" src={`http://openweathermap.org/img/wn/${icon}.png`} alt="" />
-        <div className="bydate__body__item__min">{kToCelsius(min)}</div>
+        <div className="bydate__body__item__max">{isCelsius ? `${kToCelsius(max)}°C` : `${kToFahrenheit(max)}°F`}</div>
+        <div className="bydate__body__item__min">{isCelsius ? `${kToCelsius(min)}°C` : `${kToFahrenheit(min)}°F`}</div>
       </div>
     )
   }
@@ -129,11 +129,11 @@ function App() {
             )}
           </div>
           <div className="bydate__body">
-          {byDateHourly ? weatherData.hourly.slice(0, 6).map((item, ix) => (
-            <ByHourBodyItem key={ix} time={item.dt} icon={item.weather[0].icon} temp={item.temp} />
+          {byDateHourly ? weatherData.hourly.slice(0, 5).map((item, ix) => (
+            <ByHourBodyItem key={ix} date={item.dt} icon={item.weather[0].icon} temp={item.temp} />
           )) : (
-            weatherData.daily.slice(0, 6).map((item, ix) => (
-              <ByDayBodyItem key={ix} min={item.temp.min} icon={item.weather[0].icon} max={item.temp.max} />
+            weatherData.daily.slice(0, 5).map((item, ix) => (
+              <ByDayBodyItem key={ix} date={item.dt} min={item.temp.min} icon={item.weather[0].icon} max={item.temp.max} />
           )))}
 
           </div>
@@ -141,6 +141,6 @@ function App() {
       </div>
     </div>
   ) : null;
-}
+}            
 
 export default App;
